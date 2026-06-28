@@ -8,46 +8,81 @@
 <h4 align="center">A Linux based tool that disguises your payload as 40+ file formats to silently execute on a Linux system.
 </h4>
 
+---
 
-### DESCRIPTION
+## DESCRIPTION
 
 **PWN2FILE** is an advanced Linux-based red team tool that generates malicious desktop launchers disguised as legitimate files. The tool supports 40+ different file formats across multiple categories including documents, media files, archives, and text files.
 
+**Inspired by APT41's proven social engineering and initial access tradecraft** — specifically their use of spear-phishing campaigns and convincing file lures to deliver first-stage payloads — PWN2FILE demonstrates how sophisticated threat actors leverage user trust and desktop environments to gain initial footholds. APT41 has consistently used file-based lures in their operations, often delivering malicious documents or disguised executables to bypass security awareness training and endpoint protections.
+
 When an unsuspecting victim double-clicks the file, their system interprets it as a `.desktop` application rather than the genuine file it appears to be. The launcher performs **two simultaneous actions**:
+
 1. **Decoy Execution**: Downloads and opens a legitimate file (PDF, image, video, audio, archive, or text) to maintain normal behavior
 2. **Payload Delivery**: Silently fetches and executes an attacker-supplied payload in the background
 
 This sophisticated approach allows the payload to run completely undetected while the decoy file captures the victim's attention. The tool is intended for use **only in controlled environments with explicit written permission**.
 
-### Key Features
+---
 
-#### Multi-Format Disguise
+## APT41 Parallels
+
+| APT41 Technique | PWN2FILE Implementation |
+| :--- | :--- |
+| **Spear-phishing lures** | Uses realistic file icons and metadata to impersonate legitimate documents |
+| **Living off the land** | Leverages Linux's native `.desktop` file specification — no custom binaries required |
+| **Initial access focus** | Prioritizes gaining the first foothold through user interaction |
+| **Evasion of security tools** | Bypasses traditional file-type analysis and email gateway scanning |
+| **Global targeting** | Generic file format support makes the tool applicable to any target environment |
+
+---
+
+## Detection Opportunities for SOC Analysts
+
+While PWN2FILE creates convincing lures, defenders can hunt for these indicators:
+
+| Indicator | What to Look For |
+| :--- | :--- |
+| **.desktop file analysis** | Monitor for newly created `.desktop` files with `Exec=` lines containing suspicious commands (e.g., `curl`, `wget`, `bash -c`, `python -c`) |
+| **File type mismatch** | Cross-reference reported file extension (e.g., `.pdf`) with actual MIME type using `file` command |
+| **Icon anomalies** | Look for `.desktop` files using high-resolution icons inconsistent with standard desktop themes |
+| **Process execution** | Monitor for unusual execution chains originating from desktop environment components (`gio-launch-desktop`, `xdg-open`) |
+| **Email gateway** | Scan for inbound `.desktop` files via email (often blocked or quarantined by enterprise gateways) |
+| **User awareness** | Train employees to recognize when a file opens a terminal or prompts for credentials unexpectedly |
+
+---
+
+## Key Features
+
+### Multi-Format Disguise
 - **40+ supported file formats** across 6 categories
 - Authentic file icons
 - System default application integration
 
-#### Multiple Payload Options
+### Multiple Payload Options
 - **Reverse Shells**: 10 different variants (Bash, Python, Zsh, Awk, Telnet, Sqlite3, Socat, Ruby, PHP, Netcat)
 - **Metasploit**: linux/x64/meterpreter/reverse_tcp & linux/x64/meterpreter_reverse_https
 - **Custom Scripts**: Python, Bash, and Binary (ELF) payloads
 - **Customizable**: Bring your own payload files
 
-#### Cloud Infrastructure
+### Cloud Infrastructure
 - **Supabase Integration**: Reliable file hosting with CDN delivery
 - **Database Tracking**: Automatic logging of all uploaded files
 - **Direct URLs**: Instant payload access without authentication
 - **Scalable**: Free tier supports multiple concurrent operations
 
-#### Evasion Techniques
+### Evasion Techniques
 - **Temporary Files**: Automatic cleanup after execution
 - **Hidden Execution**: No terminal windows or error messages
 
-#### Zero-Dependency
+### Zero-Dependency
 - Uses only standard libraries
 - No compilation or external tools required
 - Cross-desktop environment support (GNOME, KDE, XFCE, etc.)
 
-### Supported File Types
+---
+
+## Supported File Types
 
 | Category | File Extensions | # of Formats |
 |----------|----------------|--------------|
@@ -59,6 +94,7 @@ This sophisticated approach allows the payload to run completely undetected whil
 | **Text** | .txt, .log, .conf, .cfg, .ini, .properties, .env, .md, .rst, .json, .csv, .xml, .yaml, .yml | 14 |
 | **TOTAL** | | **61+ formats** |
 
+---
 
 ## SETUP SUPABASE
 
